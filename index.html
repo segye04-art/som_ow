@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오버워치 리플 데이 🌸 Overwatch Replay Review</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --bg-primary: #fff0f5;
+      --bg-secondary: #ffe4e6;
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --card-border: rgba(255, 182, 193, 0.6);
+      --text-main: #4a1525;
+      --text-sub: #8c4356;
+      --pink-main: #ff69b4;
+      --pink-accent: #ff1493;
+      --pink-hover: #ff4081;
+      --pink-soft: #fff5f8;
+      --pink-border: #ffb6c1;
+      --gold-accent: #ffd700;
+      --shadow-sm: 0 4px 15px rgba(255, 105, 180, 0.12);
+      --shadow-lg: 0 10px 30px rgba(255, 105, 180, 0.22);
+      --radius: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #fff0f5 0%, #ffe4e6 50%, #ffd1dc 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      padding: 20px 15px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Background Floating Bubbles */
+    .bg-bubbles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .bubble {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255, 182, 193, 0.35);
+      animation: floatUp 12s infinite ease-in-out;
+    }
+    @keyframes floatUp {
+      0% { transform: translateY(100vh) scale(0.8); opacity: 0; }
+      50% { opacity: 0.6; }
+      100% { transform: translateY(-10vh) scale(1.2); opacity: 0; }
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Header */
+    header {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 2px solid var(--pink-border);
+      border-radius: var(--radius);
+      padding: 25px 30px;
+      margin-bottom: 25px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .brand-icon {
+      width: 55px;
+      height: 55px;
+      background: linear-gradient(135deg, var(--pink-main), var(--pink-accent));
+      color: white;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 5px 15px rgba(255, 20, 147, 0.3);
+    }
+    .brand-text h1 {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--pink-accent);
+      text-shadow: 1px 1px 0px rgba(255, 255, 255, 0.8);
+    }
+    .brand-text p {
+      font-size: 14px;
+      color: var(--text-sub);
+      font-weight: 600;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .status-badge {
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border: 1px solid #a5d6a7;
+    }
+    .status-badge.closed {
+      background: #ffebee;
+      color: #c62828;
+      border-color: #ef9a9a;
+    }
+
+    .admin-toggle-btn {
+      background: #ffffff;
+      border: 2px solid var(--pink-main);
+      color: var(--pink-accent);
+      padding: 8px 16px;
+      border-radius: 30px;
+      font-weight: 700;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .admin-toggle-btn.active {
+      background: linear-gradient(135deg, #ffd700, #ffa500);
+      color: #000;
+      border-color: #ffd700;
+      box-shadow: 0 0 12px rgba(255, 215, 0, 0.5);
+    }
+
+    /* Main Grid */
+    .grid-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 25px;
+      margin-bottom: 25px;
+    }
+
+    @media (max-width: 900px) {
+      .grid-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 2px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 25px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--pink-accent);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 2px dashed var(--pink-border);
+      padding-bottom: 10px;
+    }
+
+    /* Rules Card */
+    .rules-list {
+      list-style: none;
+      display: flex;
+      flex-direction: flex-col;
+      gap: 10px;
+    }
+    .rules-list li {
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--text-main);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .rules-list li i {
+      color: var(--pink-main);
+      margin-top: 3px;
+    }
+    .highlight-box {
+      background: var(--pink-soft);
+      border: 1.5px solid var(--pink-border);
+      border-radius: 12px;
+      padding: 12px 15px;
+      margin-top: 15px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--pink-accent);
+    }
+
+    .timer-box {
+      background: linear-gradient(135deg, var(--pink-main), var(--pink-accent));
+      color: white;
+      border-radius: 14px;
+      padding: 15px;
+      text-align: center;
+      margin-top: 15px;
+    }
+    .timer-box p { font-size: 12px; opacity: 0.9; font-weight: 600; }
+    .timer-box h3 { font-size: 22px; font-weight: 900; margin-top: 4px; letter-spacing: 1px; }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 15px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 12px 15px;
+      border: 2px solid var(--pink-border);
+      border-radius: 12px;
+      font-size: 14px;
+      background: #ffffff;
+      color: var(--text-main);
+      transition: all 0.2s;
+    }
+    .form-control:focus {
+      outline: none;
+      border-color: var(--pink-accent);
+      box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.15);
+    }
+
+    .radio-group, .check-group {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .radio-btn, .check-btn {
+      flex: 1;
+      min-width: 100px;
+    }
+    .radio-btn input, .check-btn input {
+      display: none;
+    }
+    .radio-btn label, .check-btn label {
+      display: block;
+      text-align: center;
+      padding: 10px;
+      border: 2px solid var(--pink-border);
+      border-radius: 10px;
+      background: white;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-sub);
+      transition: all 0.2s;
+    }
+    .radio-btn input:checked + label, .check-btn input:checked + label {
+      background: linear-gradient(135deg, var(--pink-main), var(--pink-accent));
+      color: white;
+      border-color: var(--pink-accent);
+      box-shadow: 0 4px 10px rgba(255, 105, 180, 0.3);
+    }
+
+    .preview-box {
+      background: var(--pink-soft);
+      border: 2px dashed var(--pink-main);
+      border-radius: 12px;
+      padding: 12px 15px;
+      font-family: monospace;
+      font-size: 13px;
+      color: var(--pink-accent);
+      font-weight: bold;
+      word-break: break-all;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, var(--pink-main), var(--pink-accent));
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 14px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(255, 20, 147, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 22px rgba(255, 20, 147, 0.4);
+    }
+
+    /* Slots Dashboard */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .section-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: var(--pink-accent);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 15px;
+      margin-bottom: 30px;
+    }
+
+    .slot-card {
+      background: white;
+      border: 2px solid var(--pink-border);
+      border-radius: 16px;
+      padding: 15px;
+      position: relative;
+      transition: all 0.2s;
+      box-shadow: var(--shadow-sm);
+    }
+    .slot-card.empty {
+      background: rgba(255, 255, 255, 0.5);
+      border: 2px dashed #ffccd5;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 130px;
+      color: #c98a9c;
+    }
+    .slot-card.empty .empty-num {
+      font-size: 20px;
+      font-weight: 900;
+      opacity: 0.5;
+    }
+    .slot-card.empty .empty-text {
+      font-size: 12px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .slot-card.watched {
+      opacity: 0.65;
+      background: #f8f9fa;
+      border-color: #ced4da;
+    }
+    .slot-card.best-replay {
+      border: 3px solid var(--gold-accent);
+      background: #fffdf0;
+      box-shadow: 0 0 18px rgba(255, 215, 0, 0.4);
+    }
+
+    .slot-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .slot-num {
+      font-size: 12px;
+      font-weight: 800;
+      background: var(--pink-soft);
+      color: var(--pink-accent);
+      padding: 3px 8px;
+      border-radius: 8px;
+    }
+    .slot-type-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 8px;
+    }
+    .badge-sub { background: #e1f5fe; color: #0288d1; }
+    .badge-cheese { background: #fff8e1; color: #f57f17; }
+    .badge-pass { background: #f3e5f5; color: #7b1fa2; }
+    .badge-basic { background: #fce4ec; color: #c2185b; }
+
+    .slot-code {
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--pink-accent);
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+    }
+    .slot-info {
+      font-size: 13px;
+      color: var(--text-main);
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .slot-title {
+      font-size: 12px;
+      color: var(--text-sub);
+      margin-top: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .slot-actions {
+      margin-top: 10px;
+      padding-top: 8px;
+      border-top: 1px dashed var(--pink-border);
+      display: flex;
+      gap: 6px;
+      justify-content: flex-end;
+    }
+    .btn-xs {
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-watched { background: #e0e0e0; color: #424242; }
+    .btn-best { background: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    .btn-delete { background: #ffebee; color: #c62828; }
+
+    /* Priority Winners Box */
+    .winners-card {
+      background: linear-gradient(135deg, #fffdf0, #fff5f8);
+      border: 2px solid var(--gold-accent);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-top: 20px;
+    }
+    .winner-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #ffffff;
+      border: 1px solid var(--gold-accent);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #856404;
+      margin: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Custom Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      width: 90%;
+      max-width: 400px;
+      border: 3px solid var(--pink-main);
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+    .modal-title { font-size: 18px; font-weight: 800; color: var(--pink-accent); margin-bottom: 10px; }
+    .modal-body { font-size: 14px; color: var(--text-main); margin-bottom: 20px; line-height: 1.5; }
+    .modal-btns { display: flex; gap: 10px; justify-content: center; }
+    .modal-btn {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-confirm { background: var(--pink-accent); color: white; }
+    .btn-cancel { background: #e0e0e0; color: #333; }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 2000;
+    }
+    .toast {
+      background: rgba(74, 21, 37, 0.9);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      border-left: 4px solid var(--pink-main);
+      animation: fadeIn 0.3s ease;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body>
+
+  <!-- Floating background bubbles -->
+  <div class="bg-bubbles">
+    <div class="bubble" style="width: 60px; height: 60px; left: 10%; animation-duration: 14s;"></div>
+    <div class="bubble" style="width: 90px; height: 90px; left: 35%; animation-duration: 18s; animation-delay: 2s;"></div>
+    <div class="bubble" style="width: 40px; height: 40px; left: 70%; animation-duration: 10s; animation-delay: 4s;"></div>
+    <div class="bubble" style="width: 70px; height: 70px; left: 85%; animation-duration: 16s; animation-delay: 1s;"></div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <div class="brand">
+        <div class="brand-icon"><i class="fa-solid fa-gamepad"></i></div>
+        <div class="brand-text">
+          <h1>오버워치 리플 데이 🌸</h1>
+          <p>Overwatch Replay Review & Community</p>
+        </div>
+      </div>
+      <div class="header-controls">
+        <span class="status-badge" id="liveBadge"><i class="fa-solid fa-circle"></i> 리플 모집 중</span>
+        <button class="admin-toggle-btn" id="adminToggleBtn" onclick="toggleAdminMode()">
+          <i class="fa-solid fa-crown"></i> 👑 방장 모드
+        </button>
+      </div>
+    </header>
+
+    <!-- Top Layout Grid -->
+    <div class="grid-layout">
+      <!-- Rules Notice Card -->
+      <div class="card">
+        <div class="card-title"><i class="fa-solid fa-circle-info"></i> 📌 신청 안내 & 규칙</div>
+        <ul class="rules-list">
+          <li><i class="fa-solid fa-heart"></i> <span>1인당 기본 <b>최대 2개</b>까지 신청 가능합니다.</span></li>
+          <li><i class="fa-solid fa-cookie"></i> <span>추가 신청은 <b>2,000 치즈</b>부터 가능합니다 (무제한).</span></li>
+          <li><i class="fa-solid fa-flower"></i> <span>팔로우 유입 시 <b>무료 신청권 1장</b> 지급!</span></li>
+          <li><i class="fa-solid fa-layer-group"></i> <span>기본 리플 슬롯은 <b>최대 12개</b>입니다 (이후 추가 신청만 가능).</span></li>
+          <li><i class="fa-solid fa-clock"></i> <span>모집 마감: <b>매주 월요일 오후 7시</b></span></li>
+          <li><i class="fa-solid fa-calendar-check"></i> <span>리플 신청은 <b>리플데이</b>에만 진행됩니다.</span></li>
+        </ul>
+
+        <div class="highlight-box">
+          🩷 구독자 혜택 안내<br/>
+          <b>[구독자 전용 추가 리플권]</b> 옵션 체크 시 1회 추가 슬롯 등록 가능!
+        </div>
+
+        <div class="highlight-box" style="background: #fffdf0; border-color: #ffd700; color: #856404; margin-top: 10px;">
+          🏆 <b>BEST 리플 혜택</b><br/>
+          전체 리플 중 최고의 리플로 뽑힌 분은 다음 리플 데이 때 <b>[리플 우선 시청권]</b> 획득! (선정 기준: 방장 마음 👑)
+        </div>
+
+        <div class="timer-box">
+          <p>⏰ 이번 주 마감까지 남은 시간</p>
+          <h3 id="countdownTimer">00일 00:00:00</h3>
+        </div>
+      </div>
+
+      <!-- Application Form Card -->
+      <div class="card">
+        <div class="card-title"><i class="fa-solid fa-pen-to-square"></i> 📝 리플 신청하기</div>
+        <form id="replayForm" onsubmit="handleFormSubmit(event)">
+          
+          <div class="form-group">
+            <label>리플 코드 (8자리)</label>
+            <input type="text" id="replayCode" class="form-control" placeholder="예: 8X3K2M" maxlength="8" required oninput="updatePreview()" />
+          </div>
+
+          <div class="form-group">
+            <label>모드 선택</label>
+            <div class="radio-group">
+              <div class="radio-btn">
+                <input type="radio" id="modeComp" name="mode" value="경쟁" checked onchange="toggleTierVisibility(); updatePreview();">
+                <label for="modeComp">⚔️ 경쟁전</label>
+              </div>
+              <div class="radio-btn">
+                <input type="radio" id="modeQuick" name="mode" value="빠대" onchange="toggleTierVisibility(); updatePreview();">
+                <label for="modeQuick">⚡ 빠른대전</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group" id="tierGroup">
+            <label>경쟁전 티어</label>
+            <select id="tierSelect" class="form-control" onchange="updatePreview()">
+              <option value="브론즈">🟤 브론즈</option>
+              <option value="실버">⚪ 실버</option>
+              <option value="골드" selected>🟡 골드</option>
+              <option value="플래티넘">🟢 플래티넘</option>
+              <option value="에메랄드">💚 에메랄드</option>
+              <option value="다이아몬드">🔷 다이아몬드</option>
+              <option value="마스터">💜 마스터</option>
+              <option value="그랜드마스터">🔴 그랜드마스터</option>
+              <option value="그 이상">👑 그 이상</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <div class="check-group">
+              <div class="check-btn">
+                <input type="checkbox" id="tierGuess" onchange="updatePreview()">
+                <label for="tierGuess">🎯 티어 맞추기 ("티맞") 신청</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>닉네임 (또는 몇 팀 누구)</label>
+            <input type="text" id="nickname" class="form-control" placeholder="예: 솜하치 (키리코)" required oninput="updatePreview()" />
+          </div>
+
+          <div class="form-group">
+            <label>간단한 제목 (선택)</label>
+            <input type="text" id="replayTitle" class="form-control" placeholder="예: 키리코로 역전 캐리한 날" oninput="updatePreview()" />
+          </div>
+
+          <div class="form-group">
+            <label>신청 구문/혜택 선택</label>
+            <select id="applyType" class="form-control" onchange="updatePreview()">
+              <option value="BASIC">🌸 일반 / 무료 신청</option>
+              <option value="SUB">🩷 구독자 혜택 (추가 리플권)</option>
+              <option value="CHEESE">🧀 치즈 후원 추가 신청</option>
+              <option value="PASS">👑 베스트 우선 시청권 사용</option>
+            </select>
+          </div>
+
+          <div class="preview-box">
+            <span id="previewText">양식을 입력해주세요</span>
+            <i class="fa-regular fa-copy" style="cursor:pointer;" title="복사" onclick="copyPreview()"></i>
+          </div>
+
+          <button type="submit" class="submit-btn"><i class="fa-solid fa-paper-plane"></i> 리플 신청서 제출하기</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Replay Slots Section -->
+    <div class="card" style="margin-bottom: 25px;">
+      <div class="section-header">
+        <div class="section-title">
+          <span>🌸 기본 리플 슬롯</span>
+          <span style="font-size: 14px; color: var(--text-sub);" id="basicCountText">(0 / 12)</span>
+        </div>
+      </div>
+      <div class="slots-grid" id="basicSlotsContainer">
+        <!-- 12 slots dynamically rendered -->
+      </div>
+
+      <div class="section-header" style="margin-top: 30px;">
+        <div class="section-title">
+          <span>🧀 추가 & 구독자 리플 슬롯</span>
+          <span style="font-size: 14px; color: var(--text-sub);" id="extraCountText">(무제한)</span>
+        </div>
+      </div>
+      <div class="slots-grid" id="extraSlotsContainer">
+        <!-- Unlimited extra slots -->
+      </div>
+    </div>
+
+    <!-- Hall of Fame & Priority Winners -->
+    <div class="winners-card">
+      <div class="card-title" style="border:none; margin-bottom: 10px;">
+        🏆 베스트 리플 획득자 (우선 시청권 보유 목록)
+      </div>
+      <div id="priorityWinnersContainer">
+        <span style="font-size: 13px; color: var(--text-sub);">아직 선정된 베스트 리플이 없습니다.</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Custom Modal -->
+  <div class="modal-overlay" id="customModal">
+    <div class="modal-content">
+      <div class="modal-title" id="modalTitle">알림</div>
+      <div class="modal-body" id="modalBody">내용입니다.</div>
+      <div class="modal-btns">
+        <button class="modal-btn btn-cancel" id="modalCancelBtn" onclick="closeModal()">취소</button>
+        <button class="modal-btn btn-confirm" id="modalConfirmBtn">확인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // State Management
+    let state = {
+      isAdmin: false,
+      replays: JSON.parse(localStorage.getItem('ow_replays') || '[]'),
+      priorityWinners: JSON.parse(localStorage.getItem('ow_priority_winners') || '[]')
+    };
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      renderSlots();
+      renderWinners();
+      startCountdown();
+      updatePreview();
+    });
+
+    // Admin Toggle
+    function toggleAdminMode() {
+      state.isAdmin = !state.isAdmin;
+      const btn = document.getElementById('adminToggleBtn');
+      if (state.isAdmin) {
+        btn.classList.add('active');
+        btn.innerHTML = `<i class="fa-solid fa-crown"></i> 👑 방장 모드 ON`;
+        showToast('👑 방장(관리자) 모드가 활성화되었습니다.');
+      } else {
+        btn.classList.remove('active');
+        btn.innerHTML = `<i class="fa-solid fa-crown"></i> 👑 방장 모드`;
+        showToast('방장 모드가 해제되었습니다.');
+      }
+      renderSlots();
+    }
+
+    // Toggle Tier Select box based on mode
+    function toggleTierVisibility() {
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      const tierGroup = document.getElementById('tierGroup');
+      if (mode === '경쟁') {
+        tierGroup.style.display = 'block';
+      } else {
+        tierGroup.style.display = 'none';
+      }
+    }
+
+    // Generate formatted preview string
+    function generatePreviewString() {
+      const code = document.getElementById('replayCode').value.trim().toUpperCase() || 'CODE';
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      const tier = document.getElementById('tierSelect').value;
+      const isTierGuess = document.getElementById('tierGuess').checked;
+      const nickname = document.getElementById('nickname').value.trim() || '닉네임';
+      const title = document.getElementById('replayTitle').value.trim();
+
+      let parts = [code, mode];
+      
+      if (mode === '경쟁') {
+        parts.push(tier);
+      }
+      if (isTierGuess) {
+        parts.push("티맞");
+      }
+      
+      parts.push(nickname);
+      if (title) {
+        parts.push(title);
+      }
+
+      return parts.join(' / ');
+    }
+
+    function updatePreview() {
+      const text = generatePreviewString();
+      document.getElementById('previewText').innerText = text;
+    }
+
+    function copyPreview() {
+      const text = document.getElementById('previewText').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('📋 신청 양식이 클립보드에 복사되었습니다!');
+      });
+    }
+
+    // Form Submission
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      const code = document.getElementById('replayCode').value.trim().toUpperCase();
+      const mode = document.querySelector('input[name="mode"]:checked').value;
+      const tier = document.getElementById('tierSelect').value;
+      const isTierGuess = document.getElementById('tierGuess').checked;
+      const nickname = document.getElementById('nickname').value.trim();
+      const title = document.getElementById('replayTitle').value.trim();
+      const applyType = document.getElementById('applyType').value;
+
+      if (code.length < 6) {
+        showModal('경고', '올바른 오버워치 리플 코드를 입력해 주세요.');
+        return;
+      }
+
+      // Check basic slot availability
+      const basicReplays = state.replays.filter(r => r.slotType === 'BASIC');
+      let targetSlotType = applyType;
+
+      if (applyType === 'BASIC' && basicReplays.length >= 12) {
+        showModal('슬롯 안내', '기본 12개 슬롯이 채워졌습니다. 추가 치즈 또는 구독자 추가 리플권 옵션으로 제출됩니다.', () => {
+          saveSubmission({ code, mode, tier, isTierGuess, nickname, title, slotType: 'CHEESE' });
+        });
+        return;
+      }
+
+      saveSubmission({ code, mode, tier, isTierGuess, nickname, title, slotType: targetSlotType });
+    }
+
+    function saveSubmission(data) {
+      const newReplay = {
+        id: Date.now(),
+        ...data,
+        formattedStr: generatePreviewString(),
+        isWatched: false,
+        isBest: false,
+        createdAt: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+      };
+
+      state.replays.push(newReplay);
+      localStorage.setItem('ow_replays', JSON.stringify(state.replays));
+
+      // Reset form
+      document.getElementById('replayCode').value = '';
+      document.getElementById('replayTitle').value = '';
+      updatePreview();
+
+      showToast('🌸 리플 신청이 완료되었습니다!');
+      renderSlots();
+    }
+
+    // Render Slots
+    function renderSlots() {
+      const basicContainer = document.getElementById('basicSlotsContainer');
+      const extraContainer = document.getElementById('extraSlotsContainer');
+
+      basicContainer.innerHTML = '';
+      extraContainer.innerHTML = '';
+
+      const basicList = state.replays.filter(r => r.slotType === 'BASIC');
+      const extraList = state.replays.filter(r => r.slotType !== 'BASIC');
+
+      document.getElementById('basicCountText').innerText = `(${basicList.length} / 12)`;
+
+      // Render 12 Basic Slots
+      for (let i = 0; i < 12; i++) {
+        const replay = basicList[i];
+        if (replay) {
+          basicContainer.appendChild(createSlotCard(replay, i + 1));
+        } else {
+          // Empty slot placeholder
+          const emptyDiv = document.createElement('div');
+          emptyDiv.className = 'slot-card empty';
+          emptyDiv.innerHTML = `
+            <div class="empty-num">#${i + 1}</div>
+            <div class="empty-text">신청 가능 슬롯</div>
+          `;
+          basicContainer.appendChild(emptyDiv);
+        }
+      }
+
+      // Render Unlimited Extra Slots
+      if (extraList.length === 0) {
+        extraContainer.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 20px; color: var(--text-sub); font-size: 13px;">
+            등록된 추가 신청 리플이 없습니다.
+          </div>`;
+      } else {
+        extraList.forEach((replay, index) => {
+          extraContainer.appendChild(createSlotCard(replay, index + 1));
+        });
+      }
+    }
+
+    function createSlotCard(replay, num) {
+      const card = document.createElement('div');
+      card.className = `slot-card ${replay.isWatched ? 'watched' : ''} ${replay.isBest ? 'best-replay' : ''}`;
+
+      let badgeClass = 'badge-basic';
+      let badgeText = '🌸 기본';
+
+      if (replay.slotType === 'SUB') { badgeClass = 'badge-sub'; badgeText = '🩷 구독자'; }
+      else if (replay.slotType === 'CHEESE') { badgeClass = 'badge-cheese'; badgeText = '🧀 치즈'; }
+      else if (replay.slotType === 'PASS') { badgeClass = 'badge-pass'; badgeText = '👑 우선권'; }
+
+      card.innerHTML = `
+        <div class="slot-header">
+          <span class="slot-num">#${num}</span>
+          <span class="slot-type-badge ${badgeClass}">${badgeText}</span>
+        </div>
+        <div class="slot-code">${replay.code}</div>
+        <div class="slot-info">
+          <b>${replay.nickname}</b> 
+          <span style="font-size:12px; opacity:0.8;">
+            (${replay.mode}${replay.mode === '경쟁' ? '·' + replay.tier : ''}${replay.isTierGuess ? '·티맞' : ''})
+          </span>
+        </div>
+        ${replay.title ? `<div class="slot-title">💬 ${replay.title}</div>` : ''}
+
+        ${state.isAdmin ? `
+          <div class="slot-actions">
+            <button class="btn-xs btn-watched" onclick="toggleWatched(${replay.id})">
+              ${replay.isWatched ? '안봄' : '시청완료'}
+            </button>
+            <button class="btn-xs btn-best" onclick="crownBest(${replay.id})">
+              👑 BEST 선정
+            </button>
+            <button class="btn-xs btn-delete" onclick="deleteSlot(${replay.id})">
+              삭제
+            </button>
+          </div>
+        ` : ''}
+      `;
+      return card;
+    }
+
+    // Admin Actions
+    function toggleWatched(id) {
+      const replay = state.replays.find(r => r.id === id);
+      if (replay) {
+        replay.isWatched = !replay.isWatched;
+        localStorage.setItem('ow_replays', JSON.stringify(state.replays));
+        renderSlots();
+      }
+    }
+
+    function crownBest(id) {
+      const replay = state.replays.find(r => r.id === id);
+      if (replay) {
+        replay.isBest = true;
+        
+        // Add to priority winners
+        if (!state.priorityWinners.includes(replay.nickname)) {
+          state.priorityWinners.push(replay.nickname);
+          localStorage.setItem('ow_priority_winners', JSON.stringify(state.priorityWinners));
+        }
+
+        localStorage.setItem('ow_replays', JSON.stringify(state.replays));
+        
+        // Confetti celebration effect
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
+
+        showToast(`🎉 [${replay.nickname}] 님이 최고의 리플로 선정되었습니다!`);
+        renderSlots();
+        renderWinners();
+      }
+    }
+
+    function deleteSlot(id) {
+      showModal('삭제 확인', '이 리플 신청 항목을 삭제하시겠습니까?', () => {
+        state.replays = state.replays.filter(r => r.id !== id);
+        localStorage.setItem('ow_replays', JSON.stringify(state.replays));
+        renderSlots();
+        showToast('삭제되었습니다.');
+      });
+    }
+
+    function renderWinners() {
+      const container = document.getElementById('priorityWinnersContainer');
+      if (state.priorityWinners.length === 0) {
+        container.innerHTML = `<span style="font-size: 13px; color: var(--text-sub);">아직 선정된 베스트 리플이 없습니다.</span>`;
+        return;
+      }
+
+      container.innerHTML = state.priorityWinners.map(name => `
+        <span class="winner-tag"><i class="fa-solid fa-crown" style="color:#ffd700;"></i> ${name}</span>
+      `).join('');
+    }
+
+    // Countdown Timer (Next Monday 7:00 PM KST)
+    function startCountdown() {
+      function updateTimer() {
+        const now = new Date();
+        const nextMon = new Date();
+        
+        nextMon.setDate(now.getDate() + ((1 + 7 - now.getDay()) % 7 || 7));
+        nextMon.setHours(19, 0, 0, 0);
+
+        if (now > nextMon) {
+          nextMon.setDate(nextMon.getDate() + 7);
+        }
+
+        const diff = nextMon - now;
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+        const mins = Math.floor((diff / 1000 / 60) % 60);
+        const secs = Math.floor((diff / 1000) % 60);
+
+        document.getElementById('countdownTimer').innerText = 
+          `${days}일 ${String(hours).padStart(2,'0')}:${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+      }
+
+      updateTimer();
+      setInterval(updateTimer, 1000);
+    }
+
+    // Modal Helper
+    function showModal(title, text, onConfirm) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalBody').innerText = text;
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+
+      if (onConfirm) {
+        confirmBtn.onclick = () => {
+          onConfirm();
+          closeModal();
+        };
+      } else {
+        confirmBtn.onclick = closeModal;
+      }
+
+      document.getElementById('customModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('customModal').style.display = 'none';
+    }
+
+    // Toast Helper
+    function showToast(msg) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerText = msg;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
